@@ -1,4 +1,6 @@
 venv/
+*.pyc
+*.pyo
 */__pycache__
 
 src/profile.py

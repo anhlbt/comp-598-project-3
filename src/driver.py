@@ -5,6 +5,7 @@ import importlib
 import data_manager
 import config
 from sklearn.grid_search import GridSearchCV
+from sklearn.pipeline import Pipeline
 
 
 def load_config():
@@ -31,13 +32,34 @@ def load_dataset():
 	return X, y
 
 
-def execute_task(configuration, X, y):
+def build_pipelines(configuration):
 	"""
 	"""
-	for learner, params in configuration.learners.items():
-		grid = GridSearchCV(learner, params)
+	pipelines = []
+	for learner_tup, learner_params in configuration.learners.items():
+		for selector_tup, selector_params in configuration.selectors.items():
+			learner_name = learner_tup[0]
+			learner = learner_tup[1]
+			selector_name = selector_tup[0]
+			selector = selector_tup[1]
+			pipe = Pipeline([
+				(selector_name, selector), 
+				(learner_name, learner)
+			])
+			params = dict(learner_params, **selector_params)
+			pipelines.append((pipe, params))
+	return pipelines
+
+
+
+def execute_configuration(configuration, X, y):
+	"""
+	"""
+	for pipeline, params in build_pipelines(configuration):
+		grid = GridSearchCV(pipeline, params)
 		grid.fit(X, y)
 		print(grid.score(X, y))
+	#print(grid.grid_scores_)
 
 
 def main():
@@ -46,7 +68,7 @@ def main():
 	"""
 	X, y = load_dataset()
 	configuration = load_config()
-	execute_task(configuration, X, y)
+	execute_configuration(configuration, X, y)
 
 
 if __name__ == "__main__":
