@@ -1,4 +1,7 @@
 # Comp 598 Project 3
+
+![Discuss at https://gitter.im/itscharlieb/comp-598-project-3](https://badges.gitter.im/Join%20Chat.svg)
+
 ### Classifying Digits
 Image classification project with Python and Scikit learn for Comp 598 at McGill.
 
