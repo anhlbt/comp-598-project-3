@@ -1,7 +1,7 @@
 __author__ = 'Charlie'
 
 #classifiers
-from sklearn.svm import SVC
+from sklearn.svm import LinearSVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 
@@ -20,8 +20,7 @@ selectors = {
 
 
 learners = {
-	('svc', SVC()): {
-		'svc__kernel': ('linear', 'rbf'),
+	('svc', LinearSVC()): {
 		'svc__C': (1.0, 10.0)
 	},
 
