@@ -4,6 +4,7 @@ __author__ = "Charlie"
 import importlib
 import data_manager
 import config
+import numpy as np
 from sklearn.grid_search import GridSearchCV
 from sklearn.pipeline import Pipeline
 
@@ -16,7 +17,7 @@ def load_config():
 	"""
 	for i, c in enumerate(config.__all__):
 		print("[{}] {}".format(i, c))
-	inp = input("Select your config file.\n>>>")
+	inp = input("Select your run configurations.\n>>>")
 	return importlib.import_module("config." + config.__all__[i])
 
 
@@ -28,7 +29,12 @@ def load_dataset():
 
 	@return: np.matrix, np,array
 	"""
-	X, y = data_manager.load_test_data()
+	load_functions = []
+	for i, (dataset_name, load_function) in enumerate(data_manager.available_datasets()):
+		load_functions.append(load_function)
+		print("[{}] {}".format(i, dataset_name))
+	inp = input("Select your dataset.\n>>>")
+	X, y = load_functions[i]()
 	return X, y
 
 
@@ -51,24 +57,30 @@ def build_pipelines(configuration):
 	return pipelines
 
 
-
 def execute_configuration(configuration, X, y):
 	"""
 	"""
 	for pipeline, params in build_pipelines(configuration):
-		grid = GridSearchCV(pipeline, params)
+		grid = GridSearchCV(pipeline, params, cv=10)
 		grid.fit(X, y)
-		print(grid.score(X, y))
+		for score in grid.grid_scores_:			
+			print(score.parameters, \
+				'[Mean]          = %5.4f%%' % score.mean_validation_score, \
+				'[Std Deviation] = %5.4f%%' % np.std(score.cv_validation_scores))
 
 
 def main():
 	"""
 	Main program loop
 	"""
-	X, y = load_dataset()
-	configuration = load_config()
-	execute_configuration(configuration, X, y)
+	running = True
+
+	while running:
+		X, y = load_dataset()
+		configuration = load_config()
+		execute_configuration(configuration, X, y)
+		running = prompt
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	main()
