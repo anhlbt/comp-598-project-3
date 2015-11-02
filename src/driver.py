@@ -59,7 +59,6 @@ def execute_configuration(configuration, X, y):
 		grid = GridSearchCV(pipeline, params)
 		grid.fit(X, y)
 		print(grid.score(X, y))
-	#print(grid.grid_scores_)
 
 
 def main():
