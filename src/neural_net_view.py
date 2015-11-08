@@ -84,7 +84,8 @@ class NeuralNetView:
 
     def show_report(self,X,Y):
         report=self.get_report(X,Y)
-        for key in report:
+        keys=sorted(list(report.keys()))
+        for key in keys:
             print_color(key.upper(),COLORS.GREEN)
             data=report[key]
             if type(data) is list:
