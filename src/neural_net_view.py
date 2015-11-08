@@ -63,7 +63,9 @@ class NeuralNetView:
         error_squared=0
         results={}
         success_count=0
+        timer=Timer(self.timer_interval)
         for i in range(len(X)):
+            timer.tick("Starting forward pass for trial %s/%s"%(i,len(X)))
             self.forward(X[i])
 
             output=self.get_output()[0]
@@ -78,6 +80,7 @@ class NeuralNetView:
                 success_count+=1
             else:
                 errors.append("result=%s expected=%s case=%s"%(result,expected,str(X[i])))
+        timer.stop("Validation")
         
         report={"errors":errors,
                 "error squared":error_squared,
@@ -92,8 +95,10 @@ class NeuralNetView:
             print_color(key.upper(),COLORS.GREEN)
             data=report[key]
             if type(data) is list:
-                print("    ",end="")
-                print_color("\n    ".join(data),COLORS.ORANGE)
+                text="    "+"\n    ".join(data)
+                if len(text)>1000:
+                    text=text[:1000]+" ..."
+                print_color(text,COLORS.ORANGE)
             else:
                 print_color(str(data),COLORS.YELLOW)
 

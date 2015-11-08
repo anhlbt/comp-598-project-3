@@ -5,8 +5,6 @@ from utilities import *
 from constants import *
 from neural_net_view import NeuralNetView
 
-np.random.seed(123)
-
 class NeuralNet(NeuralNetView):  
     def __init__(self, sizes,learning_rate=0.1,verbose=0,logging=0,timer_interval=10):
         self.sizes=sizes
@@ -67,7 +65,7 @@ class NeuralNet(NeuralNetView):
                 self.outputs[i][-1:, :] = 1.0
     
     def backward(self, desired_outputs):
-        #where desired_outputs is simply a list of numbers, of length self.sizes[-1]
+        #where desired_outputs is simply a list of numbers 0 to 1, of length self.sizes[-1]
         self.back_count+=1
         if self.verbose>1:
             print_color("Starting backward.",COLORS.ORANGE)
@@ -102,6 +100,9 @@ class NeuralNet(NeuralNetView):
                 len(X),len(Y),len(X[0]),self.sizes[0]))
         if self.verbose:
             print_color("Started training for %s trials."%trial_count,COLORS.YELLOW)
+
+        #convert Y=[[2],[0],[1]...] to Y=[[0,0,1],[1,0,0],[0,1,0]...], or does nothing if Y=[[1],[0] ...]
+        Y=neuronize(Y)
 
         timer=Timer(self.timer_interval)
         for i in range(trial_count):
