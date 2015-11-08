@@ -1,6 +1,25 @@
 
-import os, time, platform
+import os, time, platform, random
 from constants import *
+
+def get_data(csv_name,validation_ratio):
+    if validation_ratio<0 or validation_ratio>1:
+        raise ValueError("bad validation ratio")
+    X,Y=[],[]
+    with open(csv_name,"r") as f:
+        lines= f.readlines()
+
+    random.shuffle(lines)
+    X=[[float(i) for i in line.strip().split(",")[1:]] for line in lines]
+    Y=[[float(line[0])] for line in lines]
+    
+    count=round(validation_ratio*len(X))
+    X_train=X[:count]
+    Y_train=Y[:count]
+    X_valid=X[count:]
+    Y_valid=Y[count:]
+
+    return X_train,Y_train,X_valid,Y_valid
 
 def add_filename_prefix_to_path(prefix,source):
     #given prefix="test-" and source="/path/to/thingy.csv", returns "/path/to/test-thingy.csv
