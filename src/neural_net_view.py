@@ -82,5 +82,14 @@ class NeuralNetView:
                 "success count":success_count}
         return report
 
-
+    def show_report(self,X,Y):
+        report=self.get_report(X,Y)
+        for key in report:
+            print_color(key.upper(),COLORS.GREEN)
+            data=report[key]
+            if type(data) is list:
+                print("    ",end="")
+                print_color("\n    ".join(data),COLORS.ORANGE)
+            else:
+                print_color(str(data),COLORS.YELLOW)
 

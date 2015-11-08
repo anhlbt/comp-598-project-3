@@ -9,8 +9,10 @@ Options:
     --learn-rate=<lr>      Set learning rate to this [default: 0.1]
     --random               Do not use seed, make trials actually random each time.
     --timer=<interval>     Wait this many seconds before printing an update during big jobs. [default: 10]
+
     --validate
-    --validation-ratio=<r>  Number from 0 to 1. 0.8 means 80% of data is used for training, 20% for validation. [default: 0.8]
+    --validation-ratio=<r>  Number from 0 to 1. 0.8 means 80% of data is used for training, 20% for validation. If value is 1 and --validate is specified, then training=validation for basic testing purposes [default: 0.8]
+
     --sizes=<sizes>        Describes the number of nodes per layer: input, hidden(s), and output. [default: 2,2,1]
 
     --verbose
@@ -61,43 +63,49 @@ def main(args):
     try:
         trials=int(args["--trials"])
     except ValueError:
-        print_color("Bad value for trials.")
+        print_color("Bad value for trials.",COLORS.RED)
         return
 
     try:
-        learn_rate=int(args["--learn-rate"])
+        learn_rate=float(args["--learn-rate"])
     except ValueError:
-        print_color("Bad value for learn rate.")
+        print_color("Bad value for learn rate.",COLORS.RED)
         return
 
     try:
         interval=int(args["--timer"])
     except ValueError:
-        print_color("Bad value for timer interval.")
+        print_color("Bad value for timer interval.",COLORS.RED)
         return
 
     try:
         sizes=[int(i) for i in args["--sizes"].split(",")]
     except ValueError:
-        print_color("Bad value for sizes.")
+        print_color("Bad value for sizes.",COLORS.RED)
         return
 
     try:
         validation_ratio=float(args["--validation-ratio"])
     except ValueError:
-        print_color("Bad value for validation ratio.")
+        print_color("Bad value for validation ratio.",COLORS.RED)
         return
 
     start_time=time.time()
 
     X_train,Y_train,X_valid,Y_valid=get_data(training,validation_ratio)
+    if validation_ratio==1 and args["--validate"]:
+        X_valid,Y_valid=X_train,Y_train
 
-    nn=NeuralNetwork(sizes,learning_rate=learn_rate,verbose=args["--verbose"])
-    nn.train(X_train,Y_train,trials,timer_interval=interval)
+    if sizes[0]!=len(X_train[0]):
+        print_color("Bad 'sizes' parameter for this input data.",COLORS.RED)
+        return
+
+    nn=NeuralNet(sizes,learning_rate=learn_rate,verbose=args["--verbose"],timer_interval=interval)
+    nn.train(X_train,Y_train,trials)
 
     if args["--validate"]:
         print_color("Starting validation.",COLORS.GREEN)
-        report=nn.get_report(X_valid,Y_valid)
+        nn.show_report(X_valid,Y_valid)
     if target:
         print_color("Making predictions.",COLORS.GREEN)
         nn.make_predictions_csv(target)
