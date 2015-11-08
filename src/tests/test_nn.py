@@ -3,9 +3,18 @@ import unittest, random
 from neural_net import NeuralNet as NN
 from utilities import *
 
+import numpy as np
+
 random.seed(123)
+np.random.seed(123)
 
 class TestNN(unittest.TestCase):
+
+    def test_neuronize(self):
+        y=[[2],[0],[1]]
+        result=neuronize(y)
+        expected=[[0,0,1],[1,0,0],[0,1,0]]
+        self.assertEqual(result,expected)
 
     def test_weight_dimensions(self):
         nn=NN((2,2,1),verbose=0)
@@ -51,10 +60,18 @@ class TestNN(unittest.TestCase):
         report=nn.get_report(X,Y)
         self.assertEqual(report["errors"],[])
 
-    def test_6_bools(self):
-        X,Y,a,b=get_data("tests/test6bools.csv",1)
+    def test_3_bools(self):
+        X,Y,a,b=get_data("tests/3bools.csv",1)
 
-        nn=NN([6,36,1],verbose=0,learning_rate=1)
+        nn=NN([3,10,1],verbose=0,learning_rate=0.1)
+        nn.train(X,Y,10000)
+        report=nn.get_report(X,Y)
+        self.assertEqual(report["errors"],[])
+
+    def test_6_bools(self):
+        X,Y,a,b=get_data("tests/6bools.csv",1)
+
+        nn=NN([6,36,1],verbose=0,learning_rate=0.1)
         nn.train(X,Y,10000)
         report=nn.get_report(X,Y)
         self.assertEqual(report["errors"],[])
