@@ -1,24 +1,22 @@
  
 import numpy as np
-import os
+import os, random
 from utilities import *
 from constants import *
+from neural_net_view import NeuralNetView
 
 np.random.seed(123)
 
-class NeuralNet:  
-    def __init__(self, sizes,learning_rate=0.1,verbose=0,logging=0):
+class NeuralNet(NeuralNetView):  
+    def __init__(self, sizes,learning_rate=0.1,verbose=0,logging=0,timer_interval=10):
         self.sizes=sizes
         self.learning_rate = learning_rate
         self.verbose=verbose
-        self.logging=logging
-        if logging:
-            self.log_filename="weights.log"
-            try:
-                os.remove(self.log_filename)
-            except FileNotFoundError:
-                pass
         self.back_count=0
+        self.logging=logging
+        self.timer_interval=timer_interval
+        if logging:
+            self.setup_logging()
         
         #initialize all the lists.
         #every item in the following four lists are numpy arrays
@@ -26,8 +24,8 @@ class NeuralNet:
         self.outputs=[]
         #activations and corrections are assigned before they are used
         #so we can just initialize a list of the correct size
-        self.activations=[0 for i in sizes]
-        self.corrections=[0 for i in sizes]
+        self.activations=[-1 for i in sizes]
+        self.corrections=[-1 for i in sizes]
 
         previous_ncount=0
         for i,ncount in enumerate(sizes):
@@ -39,23 +37,6 @@ class NeuralNet:
             #all activations, outputs, and corrections start at zero
             is_last=i==len(sizes)-1
             self.outputs.append(np.zeros((ncount+(0 if is_last else 1),1),dtype=float))
-            
-    def show(self,weights=False,outputs=False,activations=False,corrections=False,all=False):
-        #this is a convenient way to show some or all of the NN info
-        def show_np_list(label,np_list):
-            print_color("%s:"%label,COLORS.YELLOW)
-            for i,item in enumerate(np_list):
-                s="" if type(item) is int else str(item.shape)
-                print("%s:"%i,s,item)
-        
-        if weights or all:
-            show_np_list("weights",self.weights)
-        if outputs or all:
-            show_np_list("outputs",self.outputs)
-        if activations or all:
-            show_np_list("activations",self.activations)
-        if corrections or all:
-            show_np_list("corrections",self.corrections)
 
     def activation_func(self,x):
         return np.tanh(x)
@@ -65,9 +46,8 @@ class NeuralNet:
                             
     def forward(self, inputs):
         #where inputs is simply a list of numbers, of length self.sizes[0]
-        if self.verbose:
+        if self.verbose>1:
             print_color("Starting forward.",COLORS.GREEN)
-            self.show(all=True)
 
         self.outputs[0][:-1, 0] = inputs
         self.outputs[0][-1:, 0] = 1.0
@@ -89,9 +69,8 @@ class NeuralNet:
     def backward(self, desired_outputs):
         #where desired_outputs is simply a list of numbers, of length self.sizes[-1]
         self.back_count+=1
-        if self.verbose:
+        if self.verbose>1:
             print_color("Starting backward.",COLORS.ORANGE)
-            self.show(all=True)
 
         error = self.outputs[-1] - np.array(desired_outputs, dtype=float)
         for i in reversed(range(1,len(self.sizes))):
@@ -108,22 +87,28 @@ class NeuralNet:
             #adjust weights according to those corrections
             self.weights[i] = self.weights[i] - self.learning_rate * np.dot(self.corrections[i],
                     self.outputs[i-1].transpose()) 
-
+        
         if self.logging:
             self.log()
-
-    def log(self):
-        text=[]
-        for w in self.weights:
-            text+=w.flatten().tolist()
-        text=",".join([str(round(i,3)) for i in text])
-        with open(self.log_filename,"a") as f:
-            f.write("\n"+text)
     
     def get_output(self):
         #where output is the output of the final layer
         #[0] is so that it returns a vector, not a weirdo 2D array with one column
         return self.outputs[-1][0]
 
+    def train(self,X,Y,trial_count):
+        if len(X) != len(Y) or len(X[0]) != self.sizes[0]:
+            raise ValueError("NeuralNetwork.train got weird X or Y data. len(X)=%s len(Y)=%s len(X[0])=%s sizes[0]=%s"%(
+                len(X),len(Y),len(X[0]),self.sizes[0]))
+        if self.verbose:
+            print_color("Started training for %s trials."%trial_count,COLORS.YELLOW)
 
-
+        timer=Timer(self.timer_interval)
+        for i in range(trial_count):
+            if self.verbose:
+                timer.tick("Running trial %s."%i)
+            index=random.randint(0,len(X)-1)
+            self.forward(X[index])
+            self.backward(Y[index])
+        if self.verbose:
+            timer.stop("Training")
