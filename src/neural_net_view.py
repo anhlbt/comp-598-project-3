@@ -14,7 +14,7 @@ class NeuralNetView:
                 pass
             try:
                 for name in names:
-                    os.remove(self.log_folder+os.sep+name+"-log.csv")
+                    os.remove(self.get_log_path(name))
             except FileNotFoundError:
                 pass 
             
@@ -49,10 +49,13 @@ class NeuralNetView:
                     text+=[w]
                 else:
                     text+=w.flatten().tolist()
-            text=",".join([str(round(i,3)) for i in text])
-            with open(self.log_folder+os.sep+key+".csv","a") as f:
+            digits=20 if key=="corrections" else 3
+            text=",".join([str(round(i,digits)) for i in text])
+            with open(self.get_log_path(key),"a") as f:
                 f.write("\n"+text)
 
+    def get_log_path(self,label):
+        return self.log_folder+os.sep+label+"-log.csv"
 
     def get_report(self,X,Y):
         #gets predictions for all of X, compares to Y, returns a report

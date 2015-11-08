@@ -9,6 +9,7 @@ Options:
     --learn-rate=<lr>      Set learning rate to this [default: 0.1]
     --random               Do not use seed, make trials actually random each time.
     --timer=<interval>     Wait this many seconds before printing an update during big jobs. [default: 10]
+    --logging              Writes the weights, outputs, etc to csvs in the logs folder for every backpropagation step.
 
     --validate
     --validation-ratio=<r>  Number from 0 to 1. 0.8 means 80% of data is used for training, 20% for validation. If value is 1 and --validate is specified, then training=validation for basic testing purposes [default: 0.8]
@@ -100,7 +101,9 @@ def main(args):
         print_color("Bad 'sizes' parameter for this input data.",COLORS.RED)
         return
 
-    nn=NeuralNet(sizes,learning_rate=learn_rate,verbose=args["--verbose"],timer_interval=interval)
+    nn=NeuralNet(sizes,learning_rate=learn_rate,
+            verbose=args["--verbose"],timer_interval=interval,
+            logging=args["--logging"])
     nn.train(X_train,Y_train,trials)
 
     if args["--validate"]:

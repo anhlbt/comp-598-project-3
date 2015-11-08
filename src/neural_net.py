@@ -106,7 +106,7 @@ class NeuralNet(NeuralNetView):
         timer=Timer(self.timer_interval)
         for i in range(trial_count):
             if self.verbose:
-                timer.tick("Running trial %s."%i)
+                timer.tick("Running trial %s/%s."%(i,trial_count))
             index=random.randint(0,len(X)-1)
             self.forward(X[index])
             self.backward(Y[index])
