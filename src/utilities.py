@@ -2,13 +2,25 @@
 import os, time, platform, random
 from constants import *
 
-def get_data(csv_name,validation_ratio):
+def neuronize(Y):
+    #convert Y=[[2],[0],[1]...] to Y=[[0,0,1],[1,0,0],[0,1,0]...], or does nothing if Y=[[1],[0] ...]
+    highest=-1
+    for i in Y:
+        highest=i[0] if i[0]>highest else highest
+    if highest==1:
+        return Y
+    
+    new_y=[[1 if i[0]==j else 0 for j in range(highest+1)] for i in Y]
+    return new_y
+
+def get_data(csv_name,validation_ratio,has_header=True):
     if validation_ratio<0 or validation_ratio>1:
         raise ValueError("bad validation ratio")
     X,Y=[],[]
     with open(csv_name,"r") as f:
         lines= f.readlines()
-
+    if has_header:
+        lines=lines[1:]
     random.shuffle(lines)
     X=[[float(i) for i in line.strip().split(",")[1:]] for line in lines]
     Y=[[float(line[0])] for line in lines]
