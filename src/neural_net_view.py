@@ -65,7 +65,8 @@ class NeuralNetView:
         success_count=0
         timer=Timer(self.timer_interval)
         for i in range(len(X)):
-            timer.tick("Starting forward pass for trial %s/%s"%(i,len(X)))
+            if self.verbose:
+                timer.tick("Starting forward pass for trial %s/%s"%(i,len(X)))
             self.forward(X[i])
 
             output=self.get_output()[0]
@@ -80,7 +81,8 @@ class NeuralNetView:
                 success_count+=1
             else:
                 errors.append("result=%s expected=%s case=%s"%(result,expected,str(X[i])))
-        timer.stop("Validation")
+        if self.verbose:
+            timer.stop("Validation")
         
         report={"errors":errors,
                 "error squared":error_squared,

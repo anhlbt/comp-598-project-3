@@ -9,6 +9,8 @@ def neuronize(Y):
         highest=i[0] if i[0]>highest else highest
     if highest==1:
         return Y
+
+    highest=int(highest)
     
     new_y=[[1 if i[0]==j else 0 for j in range(highest+1)] for i in Y]
     return new_y
