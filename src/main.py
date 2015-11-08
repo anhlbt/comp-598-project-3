@@ -93,12 +93,14 @@ def main(args):
 
     start_time=time.time()
 
+    print_color("Opening file: %s"%training,COLORS.YELLOW)
+
     X_train,Y_train,X_valid,Y_valid=get_data(training,validation_ratio)
     if validation_ratio==1 and args["--validate"]:
         X_valid,Y_valid=X_train,Y_train
 
     if sizes[0]!=len(X_train[0]):
-        print_color("Bad 'sizes' parameter for this input data.",COLORS.RED)
+        print_color("Bad 'sizes' parameter for this input data. sizes[0]=%s len(X[0])=%s"%(sizes[0],len(X_train[0])),COLORS.RED)
         return
 
     nn=NeuralNet(sizes,learning_rate=learn_rate,
@@ -110,6 +112,7 @@ def main(args):
         print_color("Starting validation.",COLORS.GREEN)
         nn.show_report(X_valid,Y_valid)
     if target:
+        raise NotImplementedError
         print_color("Making predictions.",COLORS.GREEN)
         nn.make_predictions_csv(target)
 
