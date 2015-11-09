@@ -1,0 +1,5 @@
+http://www.sersc.org/journals/IJMUE/vol8_no4_2013/39.pdf
+http://www.inb.uni-luebeck.de/publications/pdfs/LaBaMa08c.pdf
+https://github.com/mnielsen/neural-networks-and-deep-learning
+http://vip.uwaterloo.ca/files/publications/Gaussian%20MRF%20rotation-invariant%20features%20for%20SAR%20sea%20ice%20classification.pdf
+http://arxiv.org/pdf/1506.02025v1.pdf
