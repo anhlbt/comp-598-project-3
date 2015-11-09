@@ -1,7 +1,30 @@
 
-import os, time, platform, random, csv
+import os, os.path, time, platform, random, csv
 import numpy as np
 from constants import *
+
+def save_report(report):
+    keys=["accuracy","predictions","success count","fail count","validation size",
+            "validation ratio","nn size","learning rate","back count"]
+    keys.sort()
+
+    items=[]
+    for key in keys:
+        if key in report:
+            item=str(report[key]).replace(",",";").replace(" ","")
+            items.append(item)
+        else:
+            items.append("ERROR")
+            print_color("Warning: save report partially failed. key '%s' not in report."%key,COLORS.RED)
+
+    header=",".join(keys)
+    filename=LOGFOLDER+os.sep+"hyperparameters.csv"
+    data=""
+    if not os.path.isfile(filename):
+        with open(filename,"w") as f:
+            f.write(header+"\n")
+    with open(filename,"a") as f:
+        f.write(",".join(items)+"\n")
 
 def neuronize(Y):
     #convert Y=[[2],[0],[1]...] to Y=[[0,0,1],[1,0,0],[0,1,0]...], or does nothing if Y=[[1],[0] ...]

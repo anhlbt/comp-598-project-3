@@ -1,3 +1,6 @@
+import os
+
+LOGFOLDER="logs"+os.sep
 
 class COLORS:
     RED=41
