@@ -16,6 +16,11 @@ class TestNN(unittest.TestCase):
         expected=[[0,0,1],[1,0,0],[0,1,0]]
         self.assertEqual(result,expected)
 
+        y=[[0],[0],[1]]
+        result=neuronize(y)
+        expected=[[0],[0],[1]]
+        self.assertEqual(result,expected)
+
     def test_weight_dimensions(self):
         nn=NN((2,2,1),verbose=0)
 
@@ -32,6 +37,16 @@ class TestNN(unittest.TestCase):
             self.assertEqual(nn.outputs[2].shape,(1,1))
             self.assertEqual(nn.get_output().shape,(1,))
             
+    def test_3output_dimensions(self):
+        nn=NN((2,2,3),verbose=0)
+        inputs=([1,0],[0,1],[1,1],[0,0])
+        for i in inputs:
+            nn.forward(i)
+            self.assertEqual(nn.outputs[0].shape,(3,1))
+            self.assertEqual(nn.outputs[1].shape,(3,1))
+            self.assertEqual(nn.outputs[2].shape,(3,1))
+            self.assertEqual(nn.get_output().shape,(3,))
+
     def test_backward(self):
         X=[[0,0],[0,1],[1,0],[1,1]]
         Y=[[0],[1],[1],[0]]

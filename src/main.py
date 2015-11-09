@@ -118,6 +118,9 @@ def main(args):
 
     print("Done after %s seconds."%round(time.time()-start_time,1))
 
+    if args["--verbose"]:
+        nn.show(all=True)
+
 if __name__ == "__main__":
     args = docopt(__doc__, version="1.0")
     main(args)

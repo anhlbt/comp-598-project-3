@@ -70,7 +70,10 @@ class NeuralNet(NeuralNetView):
         if self.verbose>1:
             print_color("Starting backward.",COLORS.ORANGE)
 
-        error = self.outputs[-1] - np.array(desired_outputs, dtype=float)
+        desired_array=np.array(desired_outputs,dtype=float)
+        desired_array=desired_array.reshape(desired_array.shape[0],1)
+        error = self.outputs[-1] - desired_array
+        assert error.shape == self.outputs[-1].shape
         for i in reversed(range(1,len(self.sizes))):
             is_last=i==len(self.sizes)-1
 
@@ -91,8 +94,7 @@ class NeuralNet(NeuralNetView):
     
     def get_output(self):
         #where output is the output of the final layer
-        #[0] is so that it returns a vector, not a weirdo 2D array with one column
-        return self.outputs[-1][0]
+        return self.outputs[-1].flatten()
 
     def train(self,X,Y,trial_count):
         if len(X) != len(Y) or len(X[0]) != self.sizes[0]:

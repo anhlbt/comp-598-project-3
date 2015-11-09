@@ -57,36 +57,46 @@ class NeuralNetView:
     def get_log_path(self,label):
         return self.log_folder+os.sep+label+"-log.csv"
 
+    def get_prediction(self,output):
+        #if output is just one neuron, then return 0 or 1 based on its weight
+        #if output is more than one neuron, prediction is the index of the highest activated neuron
+        if len(output)==1:
+            result=1 if output>0.5 else 0
+        else:
+            result=output.tolist().index(max(output))
+        return result
+
     def get_report(self,X,Y):
         #gets predictions for all of X, compares to Y, returns a report
         errors=[]
         error_squared=0
-        results={}
+        predictions={}
         success_count=0
         timer=Timer(self.timer_interval)
         for i in range(len(X)):
             if self.verbose:
                 timer.tick("Starting forward pass for trial %s/%s"%(i,len(X)))
             self.forward(X[i])
-
-            output=self.get_output()[0]
-            result=1 if output>0.5 else 0
-            if result in results:
-                results[result]+=1
+            
+            output=self.get_output()
+            prediction=self.get_prediction(output)
+            if prediction in predictions:
+                predictions[prediction]+=1
             else:
-                results[result]=1
+                predictions[prediction]=1
             expected=Y[i][0]
+
             error_squared+=(output-expected)**2
-            if result == expected:
+            if prediction == expected:
                 success_count+=1
             else:
-                errors.append("result=%s expected=%s case=%s"%(result,expected,str(X[i])))
+                errors.append("prediction=%s expected=%s case=%s"%(prediction,expected,str(X[i])))
         if self.verbose:
             timer.stop("Validation")
         
         report={"errors":errors,
                 "error squared":error_squared,
-                "results":results,
+                "predictions":predictions,
                 "success count":success_count}
         return report
 
