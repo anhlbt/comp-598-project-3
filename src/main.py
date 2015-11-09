@@ -2,7 +2,7 @@
 COMP598 Project 3 Neural Network
 
 Usage:
-  main.py <training-csv> [<target-csv>] [options]
+  main.py <train-csv> <prediction-csv> [<target-csv>] [options]
 
 Options:
     --trials=<count>       Backpropagate this many times [default: 10000]
@@ -53,8 +53,12 @@ def main(args):
         random.seed(123)
         np.random.seed(123)
 
-    training=args["<training-csv>"]
-    if not is_file(training):
+    train_csv=args["<train-csv>"]
+    if not is_file(train_csv):
+        return
+
+    prediction_csv=args["<prediction-csv>"]
+    if not is_file(prediction_csv):
         return
 
     target=args["<target-csv>"]
@@ -93,9 +97,9 @@ def main(args):
 
     start_time=time.time()
 
-    print_color("Opening file: %s"%training,COLORS.YELLOW)
+    print_color("Opening file: %s"%train_csv,COLORS.YELLOW)
 
-    X_train,Y_train,X_valid,Y_valid=get_data(training,validation_ratio)
+    X_train,Y_train,X_valid,Y_valid=get_data_2csv(train_csv,prediction_csv,validation_ratio)
     if validation_ratio==1 and args["--validate"]:
         X_valid,Y_valid=X_train,Y_train
 
@@ -103,6 +107,7 @@ def main(args):
         print_color("Bad 'sizes' parameter for this input data. sizes[0]=%s len(X[0])=%s"%(sizes[0],len(X_train[0])),COLORS.RED)
         return
 
+    print_color("Initializing neural net.",COLORS.GREEN)
     nn=NeuralNet(sizes,learning_rate=learn_rate,
             verbose=args["--verbose"],timer_interval=interval,
             logging=args["--logging"])
@@ -116,10 +121,7 @@ def main(args):
         print_color("Making predictions.",COLORS.GREEN)
         nn.make_predictions_csv(target)
 
-    print("Done after %s seconds."%round(time.time()-start_time,1))
-
-    if args["--verbose"]:
-        nn.show(all=True)
+    print_color("Done after %s seconds."%round(time.time()-start_time,1),COLORS.GREEN)
 
 if __name__ == "__main__":
     args = docopt(__doc__, version="1.0")

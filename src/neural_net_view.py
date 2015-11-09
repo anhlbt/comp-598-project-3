@@ -49,7 +49,7 @@ class NeuralNetView:
                     text+=[w]
                 else:
                     text+=w.flatten().tolist()
-            digits=20 if key=="corrections" else 3
+            digits=20 if key in ("corrections","weights") else 3
             text=",".join([str(round(i,digits)) for i in text])
             with open(self.get_log_path(key),"a") as f:
                 f.write("\n"+text)
@@ -93,11 +93,14 @@ class NeuralNetView:
                 errors.append("prediction=%s expected=%s case=%s"%(prediction,expected,str(X[i])))
         if self.verbose:
             timer.stop("Validation")
+
+        accuracy=success_count/len(X)
         
         report={"errors":errors,
                 "error squared":error_squared,
                 "predictions":predictions,
-                "success count":success_count}
+                "success count":success_count,
+                "accuracy":accuracy}
         return report
 
     def show_report(self,X,Y):

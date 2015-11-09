@@ -1,5 +1,5 @@
 
-import os, time, platform, random
+import os, time, platform, random, csv
 from constants import *
 
 def neuronize(Y):
@@ -15,7 +15,37 @@ def neuronize(Y):
     new_y=[[1 if i[0]==j else 0 for j in range(highest+1)] for i in Y]
     return new_y
 
-def get_data(csv_name,validation_ratio,has_header=True):
+def get_data_2csv(csv_train,csv_valid,validation_ratio,has_header=True):
+    #ignores the first column, optionally ignores the first row (has_header)
+    if validation_ratio<0 or validation_ratio>1:
+        raise ValueError("bad validation ratio")
+    X,Y=[],[]
+    with open(csv_train,"r") as f:
+        reader=csv.reader(f,delimiter=",")
+        if has_header:
+            next(reader)
+        for line in reader:
+            X.append([float(i) for i in line[1:]])
+
+    with open(csv_valid,"r") as f:
+        reader=csv.reader(f,delimiter=",")
+        if has_header:
+            next(reader)
+        for line in reader:
+            Y.append([float(i) for i in line[1:]])
+
+    XY=[(X[i],Y[i]) for i in range(len(X))]
+    random.shuffle(XY)
+    
+    count=round(validation_ratio*len(X))
+    X_train=[a[0] for a in XY[:count]]
+    Y_train=[a[1] for a in XY[:count]]
+    X_valid=[a[0] for a in XY[count:]]
+    Y_valid=[a[1] for a in XY[count:]]
+
+    return X_train,Y_train,X_valid,Y_valid
+
+def get_data_1csv(csv_name,validation_ratio,has_header=True):
     if validation_ratio<0 or validation_ratio>1:
         raise ValueError("bad validation ratio")
     X,Y=[],[]
