@@ -1,5 +1,6 @@
 
 import os, time, platform, random, csv
+import numpy as np
 from constants import *
 
 def neuronize(Y):
@@ -15,7 +16,7 @@ def neuronize(Y):
     new_y=[[1 if i[0]==j else 0 for j in range(highest+1)] for i in Y]
     return new_y
 
-def get_data_2csv(csv_train,csv_valid,validation_ratio,has_header=True):
+def get_data_2csv(csv_train,csv_valid,validation_ratio,has_header=True,normalize=False):
     #ignores the first column, optionally ignores the first row (has_header)
     if validation_ratio<0 or validation_ratio>1:
         raise ValueError("bad validation ratio")
@@ -26,6 +27,11 @@ def get_data_2csv(csv_train,csv_valid,validation_ratio,has_header=True):
             next(reader)
         for line in reader:
             X.append([float(i) for i in line[1:]])
+
+    if normalize:
+        X=np.array(X)
+        X-=X.mean()
+        X/=X.std()
 
     with open(csv_valid,"r") as f:
         reader=csv.reader(f,delimiter=",")

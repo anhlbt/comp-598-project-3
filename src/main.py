@@ -7,6 +7,7 @@ Usage:
 Options:
     --trials=<count>       Backpropagate this many times [default: 10000]
     --learn-rate=<lr>      Set learning rate to this [default: 0.1]
+    --normalize            Subtract the mean and divide by the standard deviation for all of X.
     --random               Do not use seed, make trials actually random each time.
     --timer=<interval>     Wait this many seconds before printing an update during big jobs. [default: 10]
     --logging              Writes the weights, outputs, etc to csvs in the logs folder for every backpropagation step.
@@ -99,7 +100,7 @@ def main(args):
 
     print_color("Opening file: %s"%train_csv,COLORS.YELLOW)
 
-    X_train,Y_train,X_valid,Y_valid=get_data_2csv(train_csv,prediction_csv,validation_ratio)
+    X_train,Y_train,X_valid,Y_valid=get_data_2csv(train_csv,prediction_csv,validation_ratio,normalize=True)
     if validation_ratio==1 and args["--validate"]:
         X_valid,Y_valid=X_train,Y_train
 
