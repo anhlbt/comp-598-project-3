@@ -76,7 +76,7 @@ class TestNN(unittest.TestCase):
         self.assertEqual(report["errors"],[])
 
     def test_3_bools(self):
-        X,Y,a,b=get_data("tests/3bools.csv",1)
+        X,Y,a,b=get_data_1csv("tests/3bools.csv",1)
 
         nn=NN([3,10,1],verbose=0,learning_rate=0.1)
         nn.train(X,Y,10000)
@@ -84,9 +84,17 @@ class TestNN(unittest.TestCase):
         self.assertEqual(report["errors"],[])
 
     def test_6_bools(self):
-        X,Y,a,b=get_data("tests/6bools.csv",1)
+        X,Y,a,b=get_data_1csv("tests/6bools.csv",1)
 
         nn=NN([6,36,1],verbose=0,learning_rate=0.1)
+        nn.train(X,Y,10000)
+        report=nn.get_report(X,Y)
+        self.assertEqual(report["errors"],[])
+
+    def test_3_outputs_2_bools(self):
+        X,Y,a,b=get_data_1csv("tests/3outputs2bools.csv",1)
+
+        nn=NN([2,50,3],verbose=0,learning_rate=0.1)
         nn.train(X,Y,10000)
         report=nn.get_report(X,Y)
         self.assertEqual(report["errors"],[])

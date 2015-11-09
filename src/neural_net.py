@@ -1,6 +1,6 @@
  
 import numpy as np
-import os, random
+import os, random, time
 from utilities import *
 from constants import *
 from neural_net_view import NeuralNetView
@@ -28,7 +28,7 @@ class NeuralNet(NeuralNetView):
         previous_ncount=0
         for i,ncount in enumerate(sizes):
             #initialize all weights randomly
-            self.weights.append(np.random.random((ncount,previous_ncount)))
+            self.weights.append(0.5*np.random.random((ncount,previous_ncount))-0.25)
             #add one to ncount for bias neurons
             previous_ncount=sizes[i]+1
 
@@ -40,7 +40,8 @@ class NeuralNet(NeuralNetView):
         return np.tanh(x)
 
     def d_activation_func(self,x):
-        return self.activation_func(x)*(1-self.activation_func(x))
+        #return self.activation_func(x)*(1-self.activation_func(x))
+        return 1-np.tanh(x)**2
                             
     def forward(self, inputs):
         #where inputs is simply a list of numbers, of length self.sizes[0]
@@ -107,9 +108,12 @@ class NeuralNet(NeuralNetView):
         Y=neuronize(Y)
 
         timer=Timer(self.timer_interval)
+        start_time=time.time()
         for i in range(trial_count):
             if self.verbose:
-                timer.tick("Running trial %s/%s."%(i,trial_count))
+                elapsed=time.time()-start_time
+                estimate=round((trial_count-i)/((i+1)/elapsed)/60,2)
+                timer.tick("Running trial %s/%s. Minutes remaining: %s"%(i,trial_count,estimate))
             index=random.randint(0,len(X)-1)
             self.forward(X[index])
             self.backward(Y[index])
