@@ -7,9 +7,12 @@ Usage:
 Options:
     --trials=<count>       Backpropagate this many times [default: 10000]
     --learn-rate=<lr>      Set learning rate to this [default: 0.1]
+    --final-learn-rate=<lr>      Gradually approach this learning rate throughout the trials linearly. -1 means no change. [default: -1]
+    --normalize            Subtract the mean and divide by the standard deviation for all of X.
     --random               Do not use seed, make trials actually random each time.
     --timer=<interval>     Wait this many seconds before printing an update during big jobs. [default: 10]
     --logging              Writes the weights, outputs, etc to csvs in the logs folder for every backpropagation step.
+    --report               Appends to a report csv with the hyperparameters and the accuracy for this trial.
 
     --validate
     --validation-ratio=<r>  Number from 0 to 1. 0.8 means 80% of data is used for training, 20% for validation. If value is 1 and --validate is specified, then training=validation for basic testing purposes [default: 0.8]
@@ -78,6 +81,12 @@ def main(args):
         return
 
     try:
+        final_learn_rate=float(args["--final-learn-rate"])
+    except ValueError:
+        print_color("Bad value for final learn rate.",COLORS.RED)
+        return
+
+    try:
         interval=int(args["--timer"])
     except ValueError:
         print_color("Bad value for timer interval.",COLORS.RED)
@@ -95,11 +104,10 @@ def main(args):
         print_color("Bad value for validation ratio.",COLORS.RED)
         return
 
-    start_time=time.time()
-
     print_color("Opening file: %s"%train_csv,COLORS.YELLOW)
 
-    X_train,Y_train,X_valid,Y_valid=get_data_2csv(train_csv,prediction_csv,validation_ratio)
+    X_train,Y_train,X_valid,Y_valid=get_data_2csv(train_csv,prediction_csv,
+            validation_ratio,normalize=args["--normalize"])
     if validation_ratio==1 and args["--validate"]:
         X_valid,Y_valid=X_train,Y_train
 
@@ -107,15 +115,25 @@ def main(args):
         print_color("Bad 'sizes' parameter for this input data. sizes[0]=%s len(X[0])=%s"%(sizes[0],len(X_train[0])),COLORS.RED)
         return
 
+    start_time=time.time()
     print_color("Initializing neural net.",COLORS.GREEN)
-    nn=NeuralNet(sizes,learning_rate=learn_rate,
+    nn=NeuralNet(sizes,learning_rate=learn_rate,final_learning_rate=final_learn_rate,
             verbose=args["--verbose"],timer_interval=interval,
             logging=args["--logging"])
     nn.train(X_train,Y_train,trials)
 
+    report=0
     if args["--validate"]:
         print_color("Starting validation.",COLORS.GREEN)
-        nn.show_report(X_valid,Y_valid)
+        report=nn.show_report(X_valid,Y_valid)
+    if args["--report"]:
+        if not report:
+            report=nn.get_report(X_valid,Y_valid)
+        report["validation ratio"]=validation_ratio
+        report["normalized"]=args["--normalize"]
+        report["random"]=args["--random"]
+        report["duration"]=time.time()-start_time
+        save_report(report)
     if target:
         raise NotImplementedError
         print_color("Making predictions.",COLORS.GREEN)

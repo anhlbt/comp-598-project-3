@@ -6,10 +6,9 @@ from constants import *
 class NeuralNetView:  
     def setup_logging(self):
         names=("weights","outputs","activations","corrections")
-        self.log_folder="logs"
         if self.logging:
             try:
-                os.mkdir(self.log_folder)
+                os.mkdir(LOGFOLDER)
             except OSError:
                 pass
             try:
@@ -55,7 +54,7 @@ class NeuralNetView:
                 f.write("\n"+text)
 
     def get_log_path(self,label):
-        return self.log_folder+os.sep+label+"-log.csv"
+        return LOGFOLDER+label+"-log.csv"
 
     def get_prediction(self,output):
         #if output is just one neuron, then return 0 or 1 based on its weight
@@ -100,7 +99,14 @@ class NeuralNetView:
                 "error squared":error_squared,
                 "predictions":predictions,
                 "success count":success_count,
-                "accuracy":accuracy}
+                "fail count":len(X)-success_count,
+                "accuracy":accuracy,
+                "validation size":len(X),
+                "validation ratio":-1,
+                "nn size":"-".join([str(i) for i in self.sizes]),
+                "learning rate":self.learning_rate,
+                "final learning rate":self.final_learning_rate,
+                "back count":self.back_count}
         return report
 
     def show_report(self,X,Y):
@@ -111,9 +117,10 @@ class NeuralNetView:
             data=report[key]
             if type(data) is list:
                 text="    "+"\n    ".join(data)
-                if len(text)>1000:
-                    text=text[:1000]+" ..."
+                if len(text)>100:
+                    text=text[:100]+" ..."
                 print_color(text,COLORS.ORANGE)
             else:
                 print_color(str(data),COLORS.YELLOW)
+        return report
 

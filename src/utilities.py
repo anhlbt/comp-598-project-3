@@ -1,6 +1,31 @@
 
-import os, time, platform, random, csv
+import os, os.path, time, platform, random, csv
+import numpy as np
 from constants import *
+
+def save_report(report):
+    keys=["accuracy","predictions","success count","fail count","validation size",
+            "validation ratio","nn size","learning rate","back count","normalized",
+            "random","final learning rate","duration"]
+    keys.sort()
+
+    items=[]
+    for key in keys:
+        if key in report:
+            item=str(report[key]).replace(",",";").replace(" ","")
+            items.append(item)
+        else:
+            items.append("ERROR")
+            print_color("Warning: save report partially failed. key '%s' not in report."%key,COLORS.RED)
+
+    header=",".join(keys)
+    filename=LOGFOLDER+os.sep+"hyperparameters.csv"
+    data=""
+    if not os.path.isfile(filename):
+        with open(filename,"w") as f:
+            f.write(header+"\n")
+    with open(filename,"a") as f:
+        f.write(",".join(items)+"\n")
 
 def neuronize(Y):
     #convert Y=[[2],[0],[1]...] to Y=[[0,0,1],[1,0,0],[0,1,0]...], or does nothing if Y=[[1],[0] ...]
@@ -15,7 +40,7 @@ def neuronize(Y):
     new_y=[[1 if i[0]==j else 0 for j in range(highest+1)] for i in Y]
     return new_y
 
-def get_data_2csv(csv_train,csv_valid,validation_ratio,has_header=True):
+def get_data_2csv(csv_train,csv_valid,validation_ratio,has_header=True,normalize=False):
     #ignores the first column, optionally ignores the first row (has_header)
     if validation_ratio<0 or validation_ratio>1:
         raise ValueError("bad validation ratio")
@@ -26,6 +51,11 @@ def get_data_2csv(csv_train,csv_valid,validation_ratio,has_header=True):
             next(reader)
         for line in reader:
             X.append([float(i) for i in line[1:]])
+
+    if normalize:
+        X=np.array(X)
+        X-=X.mean()
+        X/=X.std()
 
     with open(csv_valid,"r") as f:
         reader=csv.reader(f,delimiter=",")
