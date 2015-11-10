@@ -6,7 +6,12 @@ from constants import *
 from neural_net_view import NeuralNetView
 
 class NeuralNet(NeuralNetView):  
-    def __init__(self, sizes,learning_rate=0.1,verbose=0,logging=0,timer_interval=10):
+    def __init__(self, sizes,learning_rate=0.1,final_learning_rate=-1,
+            verbose=0,logging=0,timer_interval=10):
+        if final_learning_rate==-1:
+            final_learning_rate=learning_rate
+        self.final_learning_rate=final_learning_rate
+
         self.sizes=sizes
         self.learning_rate = learning_rate
         self.verbose=verbose
@@ -65,8 +70,13 @@ class NeuralNet(NeuralNetView):
             if not is_last:
                 self.outputs[i][-1:, :] = 1.0
     
-    def backward(self, desired_outputs):
+    def backward(self, desired_outputs,custom_learning_rate=-1):
         #where desired_outputs is simply a list of numbers 0 to 1, of length self.sizes[-1]
+
+        #if custom learning rate is -1, just use regular learning rate
+        if custom_learning_rate==-1:
+            custom_learning_rate=self.learning_rate
+
         self.back_count+=1
         if self.verbose>1:
             print_color("Starting backward.",COLORS.ORANGE)
@@ -87,7 +97,7 @@ class NeuralNet(NeuralNetView):
                 self.corrections[i] = self.d_activation_func(self.activations[i]) * np.dot(self.weights[i+1][:,:-1].transpose(), self.corrections[i+1])
 
             #adjust weights according to those corrections
-            self.weights[i] = self.weights[i] - self.learning_rate * np.dot(self.corrections[i],
+            self.weights[i] = self.weights[i] - custom_learning_rate * np.dot(self.corrections[i],
                     self.outputs[i-1].transpose()) 
         
         if self.logging:
@@ -116,6 +126,8 @@ class NeuralNet(NeuralNetView):
                 timer.tick("Running trial %s/%s. Minutes remaining: %s"%(i,trial_count,estimate))
             index=random.randint(0,len(X)-1)
             self.forward(X[index])
-            self.backward(Y[index])
+
+            adjusted_learning_rate=self.learning_rate-(self.learning_rate-self.final_learning_rate)*(i/trial_count)
+            self.backward(Y[index],custom_learning_rate=adjusted_learning_rate)
         if self.verbose:
             timer.stop("Training")

@@ -5,7 +5,8 @@ from constants import *
 
 def save_report(report):
     keys=["accuracy","predictions","success count","fail count","validation size",
-            "validation ratio","nn size","learning rate","back count"]
+            "validation ratio","nn size","learning rate","back count","normalized",
+            "random","final learning rate","duration"]
     keys.sort()
 
     items=[]

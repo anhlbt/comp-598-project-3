@@ -105,6 +105,7 @@ class NeuralNetView:
                 "validation ratio":-1,
                 "nn size":"-".join([str(i) for i in self.sizes]),
                 "learning rate":self.learning_rate,
+                "final learning rate":self.final_learning_rate,
                 "back count":self.back_count}
         return report
 
