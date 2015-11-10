@@ -85,7 +85,7 @@ def load_rotated_images():
     :return: tuple of 3d numpy array of images and 1d numpy array of images
     """
     images, classes = load_raw_data()
-    images = np.reshape(images (-1, 48, 48))
+    images = np.reshape(images, (-1, 48, 48))
     return generate_rotated_images(images, classes)
 
 
