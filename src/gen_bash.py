@@ -1,5 +1,5 @@
 
-b="python3 main.py ../../data/data_and_scripts/train_inputs.csv ../../data/data_and_scripts/train_outputs.csv --sizes=2304,{hidden}10 --validate --trials={trials} --learn-rate={lr} --validation-ratio=0.9 --random {normalize} --report --final-learn-rate={flr} --timer=120"
+b="python3 main.py ../../data/data_and_scripts/train_inputs.csv ../../data/data_and_scripts/train_outputs.csv --sizes=2304,{hidden}10 --validate --trials={trials} --learn-rate={lr} --validation-ratio=0.9 --random {normalize} --report --final-learn-rate={flr} --timer=120 --verbose"
 
 import random, math
 
