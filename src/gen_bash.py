@@ -1,5 +1,5 @@
 
-b="python3 main.py ../../data/data_and_scripts/train_inputs.csv ../../data/data_and_scripts/train_outputs.csv --sizes=2304,{hidden}10 --validate --trials={trials} --learn-rate={lr} --validation-ratio=0.9 --random {normalize} --report --final-learn-rate={flr}"
+b="python3 main.py ../../data/data_and_scripts/train_inputs.csv ../../data/data_and_scripts/train_outputs.csv --sizes=2304,{hidden}10 --validate --trials={trials} --learn-rate={lr} --validation-ratio=0.9 --random {normalize} --report --final-learn-rate={flr} --timer=120"
 
 import random, math
 
@@ -20,7 +20,7 @@ def get_bash():
 
 def get_hyper():
     hyper={"trials":random.randint(1,100)*10000,
-            "lr":magic(0.001,5),
+            "lr":magic(0.01,3),
             "normalize":"--normalize" if random.random()>0.1 else ""}
     hyper["flr"]=hyper["lr"]*random.random()
 

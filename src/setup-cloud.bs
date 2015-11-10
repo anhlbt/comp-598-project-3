@@ -1,2 +1,7 @@
 sudo apt-get install git python3 python3-pip
+git clone https://github.com/itscharlieb/comp-598-project-3
 pip3 install -r ../requirements.txt
+
+#  rsync -zv train_inputs.csv.tar.gz  root@159.203.11.21:/root/data/data_and_scripts/
+#  rsync -zv train_outputs.csv  root@159.203.11.21:/root/data/data_and_scripts/
+#  tar -xzvf train_inputs.csv.tar.gz
