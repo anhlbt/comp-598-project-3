@@ -3,6 +3,7 @@ __author__ = "Charlie, Josh"
 from sklearn import datasets
 import numpy as np
 from scipy.ndimage.interpolation import rotate
+import itertools
 from PIL import Image
 
 train_inputs1 = './data/train_inputs1.npz'
@@ -49,7 +50,8 @@ def load_raw_data():
     """
     Delegates to load_test_data
     """
-    return load_test_data()
+    imgs, clss = load_test_data()
+    return np.reshape(imgs, (-1, 48, 48)), clss
 
 
 def _rotations(image, num_rotations):
@@ -85,8 +87,19 @@ def load_rotated_images():
     :return: tuple of 3d numpy array of images and 1d numpy array of images
     """
     images, classes = load_raw_data()
-    images = np.reshape(images, (-1, 48, 48))
     return generate_rotated_images(images, classes)
+
+
+def trim_edges(image, edge_top=2, edge_left=2, edge_bottom=2, edge_right=2):
+    """
+    :param images: numpy array with dimension (n, 48, 48)
+    :return: numpy array with dimension (n, (48-edge_left-edge_right), (48-edge_top-edge_bottom))
+    where the edges of the arrray have been removed
+    """
+    width, height = image.shape[0], image.shape[1]
+    rows = [i for i in itertools.chain(range(edge_top), range(height-edge_bottom, height))]
+    columns = [i for i in itertools.chain(range(edge_left), range(width-edge_right, width))]
+    return np.delete(np.delete(image, rows, 0), columns, 1)
 
 
 def available_datasets():
