@@ -19,7 +19,7 @@ def get_bash():
     return b.format(**get_hyper())
 
 def get_hyper():
-    hyper={"trials":random.randint(1,100)*10000,
+    hyper={"trials":random.randint(1,100)*2000,
             "lr":magic(0.01,3),
             "normalize":"--normalize" if random.random()>0.1 else ""}
     hyper["flr"]=hyper["lr"]*random.random()
