@@ -37,3 +37,19 @@ class TestDataManager(unittest.TestCase):
 
         self.assertTrue(np.array_equal(rotated_imgs, expected_rotated_imgs))
         self.assertTrue(np.array_equal(rotated_clss, expected_rotated_clss))
+
+    def test_trim_edges(self):
+        img = np.reshape(np.array(range(25)), (5, 5))
+
+        expected_trimmed_by_one = np.array([
+            [6, 7, 8],
+            [11, 12, 13],
+            [16, 17, 18]
+        ])
+        trimmed_by_one = data_manager.trim_edges(img, 1, 1, 1, 1)
+        self.assertTrue(np.array_equal(expected_trimmed_by_one, trimmed_by_one))
+
+
+        expected_trim_edge_by_two = np.array([[12]])
+        trimmed_by_two = data_manager.trim_edges(img, 2, 2, 2, 2)
+        self.assertTrue(np.array_equal(expected_trim_edge_by_two, trimmed_by_two))

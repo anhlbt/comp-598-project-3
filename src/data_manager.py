@@ -18,11 +18,21 @@ def memoize(func):
     @ return: decorated function
     """
     cache = {}
+
     def wrapped(*args):
         if args not in cache:
             cache[args] = func(*args)
         return cache[args]
     return wrapped
+
+
+def available_datasets():
+    """
+    """
+    return [
+        ('iris', load_iris_data),
+        ('kaggle images', load_raw_data)
+    ]
 
 
 def load_test_data():
@@ -50,22 +60,30 @@ def load_raw_data():
     """
     Delegates to load_test_data
     """
-    imgs, clss = load_test_data()
-    return np.reshape(imgs, (-1, 48, 48)), clss
+    images, classes = load_test_data()
+    return np.reshape(images, (-1, 48, 48)), classes
 
 
-def _rotations(image, num_rotations):
+def load_rotated_images():
     """
-    :param image:
-    :return: array of rotated images
+    :return: tuple of 3d numpy array of images and 1d numpy array of images
     """
-    angle = 360 / num_rotations
-    rotations = np.empty((num_rotations, image.shape[0], image.shape[1]))
-    rotated_image = image
-    for i in range(num_rotations):
-        rotations[i] = rotated_image
-        rotated_image = rotate(rotated_image, angle)
-    return rotations
+    images, classes = load_raw_data()
+    return generate_rotated_images(images, classes)
+
+
+def load_transformed_images(rotated=True, trimmed=True):
+    """
+    :param rotated: boolean. if true, will generate rotated images
+    :param trimmed: boolean. if true, will generate trimmed images
+    :return: transformed images
+    """
+    images, classes = load_raw_data()
+    if rotated:
+        images, classes = generate_rotated_images(images, classes)
+    if trimmed:
+        images = generate_trimmed_images(images)
+    return images, classes
 
 
 def generate_rotated_images(images, classes):
@@ -82,30 +100,42 @@ def generate_rotated_images(images, classes):
     return np.vstack(tuple(rotated_images)), np.repeat(classes, num_rotations)
 
 
-def load_rotated_images():
+def generate_trimmed_images(images, edge_top=2, edge_left=2, edge_bottom=2, edge_right=2):
     """
-    :return: tuple of 3d numpy array of images and 1d numpy array of images
+    :param images: 3d numpy array with dimension (n, 48, 48)
+    :return: numpy array with dimension (n, (48-edge_left-edge_right), (48-edge_top-edge_bottom))
+    where the edges of image have been removed
     """
-    images, classes = load_raw_data()
-    return generate_rotated_images(images, classes)
+    trimmed_images = []
+    for index in range(images.shape[0]):
+        image = images[index,:,:]
+        trimmed_images.append(trim_edges(image, edge_top, edge_left, edge_bottom, edge_right))
+    return np.vstack(tuple(trimmed_images))
+
+
+def _rotations(image, num_rotations):
+    """
+    :param image:
+    :return: array of rotated images
+    """
+    angle = 360 / num_rotations
+    rotations = np.empty((num_rotations, image.shape[0], image.shape[1]))
+    rotated_image = image
+    for i in range(num_rotations):
+        rotations[i] = rotated_image
+        rotated_image = rotate(rotated_image, angle)
+    return rotations
 
 
 def trim_edges(image, edge_top=2, edge_left=2, edge_bottom=2, edge_right=2):
-    """
-    :param images: numpy array with dimension (n, 48, 48)
-    :return: numpy array with dimension (n, (48-edge_left-edge_right), (48-edge_top-edge_bottom))
-    where the edges of the arrray have been removed
-    """
-    width, height = image.shape[0], image.shape[1]
-    rows = [i for i in itertools.chain(range(edge_top), range(height-edge_bottom, height))]
-    columns = [i for i in itertools.chain(range(edge_left), range(width-edge_right, width))]
+    rows, columns = _edges(image.shape, edge_top, edge_left, edge_bottom, edge_right)
     return np.delete(np.delete(image, rows, 0), columns, 1)
 
 
-def available_datasets():
-    """
-    """
-    return [
-        ('iris', load_iris_data),
-        ('kaggle images', load_raw_data)
-    ]
+@memoize
+def _edges(shape, edge_top, edge_left, edge_bottom, edge_right):
+    height, width = shape
+    rows = [i for i in itertools.chain(range(edge_top), range(height-edge_bottom, height))]
+    columns = [i for i in itertools.chain(range(edge_left), range(width-edge_right, width))]
+    return rows, columns
+
