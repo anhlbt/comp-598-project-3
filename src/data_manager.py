@@ -57,7 +57,7 @@ def load_iris_data():
     return np.matrix(iris.data), np.array(iris.target)
 
 
-def load_all_images(rotate=True):
+def load_all_images(rotate=False):
     """
     Concatenated and shuffles images returned by load_raw_data, load_raw_mnist_images, and load_transformed_images
     :return: all available images as np.array (n x 48 x 48) where n is the number of available images
@@ -65,9 +65,10 @@ def load_all_images(rotate=True):
 
     mnist_imgs, mnist_clss = load_filtered_mnist_images()
     raw_imgs, raw_clss = load_raw_data()
-    imgs, clss = np.vstack(raw_imgs, mnist_imgs), np.vstack(raw_clss,  mnist_clss)
+    imgs = np.vstack((raw_imgs, mnist_imgs))
+    clss = np.concatenate((raw_clss,  mnist_clss))
     imgs, clss = shuffle(imgs, clss)
-    imgs, clss = generate_trimmed_images(imgs, clss)
+    imgs = generate_trimmed_images(imgs)
     if rotate:
         imgs, clss = generate_rotated_images(imgs, clss)
     return imgs, clss
