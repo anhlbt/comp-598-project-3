@@ -57,10 +57,10 @@ def load_iris_data():
     return np.matrix(iris.data), np.array(iris.target)
 
 
-def load_all_images(rotate=False):
+def load_all_images(rotate=False, trim=False):
     """
-    Concatenated and shuffles images returned by load_raw_data, load_raw_mnist_images, and load_transformed_images
-    :return: all available images as np.array (n x 48 x 48) where n is the number of available images
+    Concatenates and shuffles images returned by load_raw_data, load_raw_mnist_images, and load_transformed_images
+    :return: all available images as np.array
     """
 
     mnist_imgs, mnist_clss = load_filtered_mnist_images()
@@ -68,7 +68,8 @@ def load_all_images(rotate=False):
     imgs = np.vstack((raw_imgs, mnist_imgs))
     clss = np.concatenate((raw_clss,  mnist_clss))
     imgs, clss = shuffle(imgs, clss)
-    imgs = generate_trimmed_images(imgs)
+    if trim:
+        imgs = generate_trimmed_images(imgs)
     if rotate:
         imgs, clss = generate_rotated_images(imgs, clss)
     return imgs, clss
@@ -140,9 +141,8 @@ def generate_rotated_images(images, classes):
     """
     num_rotations = 4
     rotated_images = []
-    for index in range(images.shape[0]):
-        image = images[index,:,:]
-        rotated_images.append(_rotations(image, num_rotations))
+    for index, img in enumerate(images):
+        rotated_images.append(_rotations(img, num_rotations))
     return np.vstack(tuple(rotated_images)), np.repeat(classes, num_rotations)
 
 
@@ -153,9 +153,8 @@ def generate_trimmed_images(images, edge_top=2, edge_left=2, edge_bottom=2, edge
     where the edges of image have been removed
     """
     trimmed_images = []
-    for index in range(images.shape[0]):
-        image = images[index,:,:]
-        trimmed_images.append(trim_edges(image, edge_top, edge_left, edge_bottom, edge_right))
+    for index, img in enumerate(images):
+        trimmed_images.append(trim_edges(img, edge_top, edge_left, edge_bottom, edge_right))
     return np.vstack(tuple(trimmed_images))
 
 
