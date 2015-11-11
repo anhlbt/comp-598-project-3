@@ -48,6 +48,8 @@ def save_report(report):
     header=",".join(keys)
     filename=LOGFOLDER+os.sep+"hyperparameters.csv"
     data=""
+    if not os.path.isdir(LOGFOLDER):
+        os.mkdir(LOGFOLDER)
     if not os.path.isfile(filename):
         with open(filename,"w") as f:
             f.write(header+"\n")
