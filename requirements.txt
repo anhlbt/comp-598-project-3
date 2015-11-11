@@ -1,3 +1,15 @@
+cycler==0.9.0
+decorator==4.0.4
+matplotlib==1.5.0
+networkx==1.10
 numpy==1.10.1
+Pillow==3.0.0
+PyBrain==0.3
+pyparsing==2.0.5
+python-dateutil==2.4.2
+python-mnist==0.3
+pytz==2015.7
+scikit-image==0.11.3
 scikit-learn==0.16.1
 scipy==0.16.1
+six==1.10.0
