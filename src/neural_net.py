@@ -81,20 +81,21 @@ class NeuralNet(NeuralNetView):
         if self.verbose>1:
             print_color("Starting backward.",COLORS.ORANGE)
 
-        desired_array=np.array(desired_outputs,dtype=float)
-        desired_array=desired_array.reshape(desired_array.shape[0],1)
-        error = self.outputs[-1] - desired_array
-        assert error.shape == self.outputs[-1].shape
         for i in reversed(range(1,len(self.sizes))):
             is_last=i==len(self.sizes)-1
 
             if is_last:
                 #the last calculation uses an error based on desired_outputs, instead of
                 #the next layer, since there is no next layer
-                self.corrections[i] = self.d_activation_func(self.activations[i]) * error
+                desired_array=np.array(desired_outputs,dtype=float)
+                desired_array=desired_array.reshape(desired_array.shape[0],1)
+                error=self.outputs[-1] - desired_array
             else:
                 #if not last layer, get propagate error from next layer
-                self.corrections[i] = self.d_activation_func(self.activations[i]) * np.dot(self.weights[i+1][:,:-1].transpose(), self.corrections[i+1])
+                error=np.dot(self.weights[i+1][:,:-1].transpose(), self.corrections[i+1])
+            
+            #use error to calculate gradient descent corrections
+            self.corrections[i] = self.d_activation_func(self.activations[i]) * error
 
             #adjust weights according to those corrections
             self.weights[i] = self.weights[i] - custom_learning_rate * np.dot(self.corrections[i],
