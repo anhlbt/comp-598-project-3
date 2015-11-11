@@ -68,7 +68,7 @@ def load_all_images(rotate=True):
     imgs, clss = np.vstack(raw_imgs, mnist_imgs), np.vstack(raw_clss,  mnist_clss)
     imgs, clss = shuffle(imgs, clss)
     imgs, clss = generate_trimmed_images(imgs, clss)
-    if filter:
+    if rotate:
         imgs, clss = generate_rotated_images(imgs, clss)
     return imgs, clss
 
