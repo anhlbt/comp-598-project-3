@@ -65,8 +65,10 @@ def load_all_images():
 
     mnist_imgs, mnist_clss = load_filtered_mnist_images()
     raw_imgs, raw_clss = load_raw_data()
-    imgs, clss = np.vpstack(raw_imgs, mnist_imgs), np.vstack(raw_clss,  mnist_clss)
+    imgs, clss = np.vstack(raw_imgs, mnist_imgs), np.vstack(raw_clss,  mnist_clss)
     imgs, clss = shuffle(imgs, clss)
+    imgs, clss = generate_rotated_images(imgs, clss)
+    imgs, clss = generate_trimmed_images(imgs, clss)
     return imgs, clss
 
 
@@ -85,18 +87,19 @@ def load_raw_mnist_images():
     :return: np.array of mnist images and np.array of mnist image classes
     The images are in raw format
     """
-    imgs = np.load('./data/mmist/mnist-images.npy')
+    imgs = np.load('./data/mnist/mnist-images.npy')
     clss = np.load('./data/mnist/mnist-classes.npy')
     return imgs, clss
 
 
-def load_filtered_mnist_images(filters=['emboss', 'blur']):
+def load_filtered_mnist_images():
     """
     :param *args: an option list
     :return: np.array of mnist images and np.array of mnist image classes
     The images are returned filtered by several image filters. Any filters
     that can be used with scipy.misc.imfilter may be used.
     """
+    filters = ['emboss', 'blur']
     imgs, clss = load_raw_mnist_images()
     for index, img in enumerate(imgs):
         for filter in filters:
@@ -109,8 +112,8 @@ def load_rotated_images():
     """
     :return: tuple of 3d numpy array of images and 1d numpy array of images
     """
-    images, classes = load_raw_data()
-    return generate_rotated_images(images, classes)
+    imgs, clss = load_raw_data()
+    return generate_rotated_images(imgs, clss)
 
 
 def load_transformed_images(rotated=True, trimmed=True):
@@ -119,12 +122,12 @@ def load_transformed_images(rotated=True, trimmed=True):
     :param trimmed: boolean. if true, will generate trimmed images
     :return: transformed images
     """
-    images, classes = load_raw_data()
+    imgs, clss = load_raw_data()
     if rotated:
-        images, classes = generate_rotated_images(images, classes)
+        imgs, clss = generate_rotated_images(imgs, clss)
     if trimmed:
-        images = generate_trimmed_images(images)
-    return images, classes
+        imgs = generate_trimmed_images(imgs)
+    return imgs, clss
 
 
 def generate_rotated_images(images, classes):
