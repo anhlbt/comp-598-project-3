@@ -11,6 +11,8 @@ src/profile.py
 *.iml
 *.idea
 
+# raw mnist data
+src/data/mnist/raw/*
 
 .directory
 *.swp
