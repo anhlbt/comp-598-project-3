@@ -3,8 +3,10 @@ __author__ = "Charlie, Josh"
 from sklearn import datasets
 import numpy as np
 from scipy.ndimage.interpolation import rotate
+from scipy.misc import imfilter
+from sklearn.utils import shuffle
 import itertools
-from PIL import Image
+
 
 train_inputs1 = './data/train_inputs1.npz'
 train_inputs2 = './data/train_inputs2.npz'
@@ -55,13 +57,52 @@ def load_iris_data():
     return np.matrix(iris.data), np.array(iris.target)
 
 
+def load_all_images():
+    """
+    Concatenated and shuffles images returned by load_raw_data, load_raw_mnist_images, and load_transformed_images
+    :return: all available images as np.array (n x 48 x 48) where n is the number of available images
+    """
+
+    mnist_imgs, mnist_clss = load_filtered_mnist_images()
+    raw_imgs, raw_clss = load_raw_data()
+    imgs, clss = np.vpstack(raw_imgs, mnist_imgs), np.vstack(raw_clss,  mnist_clss)
+    imgs, clss = shuffle(imgs, clss)
+    return imgs, clss
+
+
 @memoize
 def load_raw_data():
     """
     Delegates to load_test_data
     """
-    images, classes = load_test_data()
-    return np.reshape(images, (-1, 48, 48)), classes
+    imgs, clss = load_test_data()
+    return np.reshape(imgs, (-1, 48, 48)), clss
+
+
+@memoize
+def load_raw_mnist_images():
+    """
+    :return: np.array of mnist images and np.array of mnist image classes
+    The images are in raw format
+    """
+    imgs = np.load('./data/mmist/mnist-images.npy')
+    clss = np.load('./data/mnist/mnist-classes.npy')
+    return imgs, clss
+
+
+def load_filtered_mnist_images(filters=['emboss', 'blur']):
+    """
+    :param *args: an option list
+    :return: np.array of mnist images and np.array of mnist image classes
+    The images are returned filtered by several image filters. Any filters
+    that can be used with scipy.misc.imfilter may be used.
+    """
+    imgs, clss = load_raw_mnist_images()
+    for index, img in enumerate(imgs):
+        for filter in filters:
+            img = imfilter(img, filter)
+        imgs[index,:,:] = img
+    return imgs, clss
 
 
 def load_rotated_images():
