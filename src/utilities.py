@@ -28,9 +28,12 @@ class PerformanceTimer:
             print_color("%s ms (%s times)"%(round(1000*t/count,5),count),COLORS.YELLOW)
 
 def save_report(report):
-    keys=["accuracy","predictions","success count","fail count","validation size",
-            "validation ratio","nn size","learning rate","back count","normalized",
-            "random","final learning rate","duration"]
+    doubles=["accuracy","predictions","success count","fail count"]
+    keys=["validation size","validation ratio","nn size","learning rate","back count","normalized",
+            "random","final learning rate","duration","batch size"]
+    for d in doubles:
+        keys.append("train "+d)
+        keys.append("valid "+d)
     keys.sort()
 
     items=[]

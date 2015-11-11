@@ -65,18 +65,13 @@ class NeuralNetView:
             result=output.tolist().index(max(output))
         return result
 
-    def get_report(self,X,Y):
-        #gets predictions for all of X, compares to Y, returns a report
+    def get_error_report(self,label,X,Y):
+        #gets predictions for all of X, compares to Y
         errors=[]
-        error_squared=0
         predictions={}
         success_count=0
-        timer=Timer(self.timer_interval)
         for i in range(len(X)):
-            if self.verbose:
-                timer.tick("Starting forward pass for trial %s/%s"%(i,len(X)))
             self.forward(X[i])
-            
             output=self.get_output()
             prediction=self.get_prediction(output)
             if prediction in predictions:
@@ -85,32 +80,40 @@ class NeuralNetView:
                 predictions[prediction]=1
             expected=Y[i][0]
 
-            error_squared+=(output-expected)**2
             if prediction == expected:
                 success_count+=1
             else:
                 errors.append("prediction=%s expected=%s case=%s"%(prediction,expected,str(X[i])))
-        if self.verbose:
-            timer.stop("Validation")
 
         accuracy=success_count/len(X)
         
-        report={"errors":errors,
-                "error squared":error_squared,
-                "predictions":predictions,
-                "success count":success_count,
-                "fail count":len(X)-success_count,
-                "accuracy":accuracy,
-                "validation size":len(X),
+        return {label+" errors":errors,
+                label+" predictions":predictions,
+                label+" success count":success_count,
+                label+" fail count":len(X)-success_count,
+                label+" accuracy":accuracy}
+
+    def get_report(self,train_X,train_Y,valid_X,valid_Y):
+        #gets predictions for all of X, compares to Y, returns a report
+
+        report={"validation size":len(valid_X),
                 "validation ratio":-1,
                 "nn size":"-".join([str(i) for i in self.sizes]),
                 "learning rate":self.learning_rate,
                 "final learning rate":self.final_learning_rate,
-                "back count":self.back_count}
+                "back count":self.back_count,
+                "batch size":self.batch_size}
+
+        train_report=self.get_error_report("train",train_X,train_Y)
+        valid_report=self.get_error_report("valid",valid_X,valid_Y)
+
+        report.update(train_report)
+        report.update(valid_report)
+        
         return report
 
-    def show_report(self,X,Y):
-        report=self.get_report(X,Y)
+    def show_report(self,train_X,train_Y,valid_X,valid_Y):
+        report=self.get_report(train_X,train_Y,valid_X,valid_Y)
         keys=sorted(list(report.keys()))
         for key in keys:
             print_color(key.upper(),COLORS.GREEN)
