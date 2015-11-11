@@ -3,10 +3,37 @@ import os, os.path, time, platform, random, csv
 import numpy as np
 from constants import *
 
+class PerformanceTimer:
+    def __init__(self):
+        self.times={}
+        self.last_time=time.time()
+        self.last_label="start"
+
+    def tick(self,label):
+        t=time.time()
+        delta=t-self.last_time
+        self.last_time=t
+
+        if self.last_label not in self.times:
+            self.times[self.last_label]=[delta,1]
+        self.times[self.last_label][0]+=delta
+        self.times[self.last_label][1]+=1
+
+        self.last_label=label
+
+    def report(self):
+        for key in self.times:
+            t,count=self.times[key]
+            print_color(key.upper(),COLORS.GREEN)
+            print_color("%s ms (%s times)"%(round(1000*t/count,5),count),COLORS.YELLOW)
+
 def save_report(report):
-    keys=["accuracy","predictions","success count","fail count","validation size",
-            "validation ratio","nn size","learning rate","back count","normalized",
-            "random","final learning rate","duration"]
+    doubles=["accuracy","predictions","success count","fail count"]
+    keys=["validation size","validation ratio","nn size","learning rate","back count","normalized",
+            "random","final learning rate","duration","batch size"]
+    for d in doubles:
+        keys.append("train "+d)
+        keys.append("valid "+d)
     keys.sort()
 
     items=[]
@@ -21,6 +48,8 @@ def save_report(report):
     header=",".join(keys)
     filename=LOGFOLDER+os.sep+"hyperparameters.csv"
     data=""
+    if not os.path.isdir(LOGFOLDER):
+        os.mkdir(LOGFOLDER)
     if not os.path.isfile(filename):
         with open(filename,"w") as f:
             f.write(header+"\n")

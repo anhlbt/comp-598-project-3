@@ -8,6 +8,7 @@ Options:
     --trials=<count>       Backpropagate this many times [default: 10000]
     --learn-rate=<lr>      Set learning rate to this [default: 0.1]
     --final-learn-rate=<lr>      Gradually approach this learning rate throughout the trials linearly. -1 means no change. [default: -1]
+    --batch=<size>         Use mini-batches of this size to speed up training. [default: 1]
     --normalize            Subtract the mean and divide by the standard deviation for all of X.
     --random               Do not use seed, make trials actually random each time.
     --timer=<interval>     Wait this many seconds before printing an update during big jobs. [default: 10]
@@ -75,6 +76,12 @@ def main(args):
         return
 
     try:
+        batch_size=int(args["--batch"])
+    except ValueError:
+        print_color("Bad value for batch.",COLORS.RED)
+        return
+
+    try:
         learn_rate=float(args["--learn-rate"])
     except ValueError:
         print_color("Bad value for learn rate.",COLORS.RED)
@@ -120,15 +127,15 @@ def main(args):
     nn=NeuralNet(sizes,learning_rate=learn_rate,final_learning_rate=final_learn_rate,
             verbose=args["--verbose"],timer_interval=interval,
             logging=args["--logging"])
-    nn.train(X_train,Y_train,trials)
+    nn.train(X_train,Y_train,trials,batch_size=batch_size)
 
     report=0
     if args["--validate"]:
         print_color("Starting validation.",COLORS.GREEN)
-        report=nn.show_report(X_valid,Y_valid)
+        report=nn.show_report(X_train,Y_train,X_valid,Y_valid)
     if args["--report"]:
         if not report:
-            report=nn.get_report(X_valid,Y_valid)
+            report=nn.get_report(X_train,Y_train,X_valid,Y_valid)
         report["validation ratio"]=validation_ratio
         report["normalized"]=args["--normalize"]
         report["random"]=args["--random"]

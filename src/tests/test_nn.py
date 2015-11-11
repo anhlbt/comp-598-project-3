@@ -8,6 +8,8 @@ import numpy as np
 random.seed(123)
 np.random.seed(123)
 
+TRIALS=10000
+
 class TestNN(unittest.TestCase):
 
     def test_neuronize(self):
@@ -62,16 +64,24 @@ class TestNN(unittest.TestCase):
     def test_1_hidden_2n_xor(self):
         X=[[0,0],[0,1],[1,0],[1,1]]
         Y=[[0],[1],[1],[0]]
-        nn=NN([2,2,1],verbose=0,learning_rate=0.2)
-        nn.train(X,Y,10000)
+        nn=NN([2,2,1],verbose=0,learning_rate=0.03,final_learning_rate=0.001)
+        nn.train(X,Y,30000)
+        report=nn.get_report(X,Y)
+        self.assertEqual(report["errors"],[])
+
+    def test_3_bool_batch(self):
+        X,Y,a,b=get_data_1csv("tests/3bools.csv",1)
+        bs=100
+        nn=NN([3,10,1],verbose=0,learning_rate=0.1/bs)
+        nn.train(X,Y,TRIALS,batch_size=bs)
         report=nn.get_report(X,Y)
         self.assertEqual(report["errors"],[])
 
     def test_1_hidden_6n_xor(self):
         X=[[0,0],[0,1],[1,0],[1,1]]
         Y=[[0],[1],[1],[0]]
-        nn=NN([2,6,1],verbose=0,learning_rate=0.2)
-        nn.train(X,Y,10000)
+        nn=NN([2,6,1],verbose=0,learning_rate=0.1)
+        nn.train(X,Y,TRIALS)
         report=nn.get_report(X,Y)
         self.assertEqual(report["errors"],[])
 
@@ -79,7 +89,7 @@ class TestNN(unittest.TestCase):
         X,Y,a,b=get_data_1csv("tests/3bools.csv",1)
 
         nn=NN([3,10,1],verbose=0,learning_rate=0.1)
-        nn.train(X,Y,10000)
+        nn.train(X,Y,TRIALS)
         report=nn.get_report(X,Y)
         self.assertEqual(report["errors"],[])
 
@@ -87,7 +97,7 @@ class TestNN(unittest.TestCase):
         X,Y,a,b=get_data_1csv("tests/6bools.csv",1)
 
         nn=NN([6,36,1],verbose=0,learning_rate=0.1)
-        nn.train(X,Y,10000)
+        nn.train(X,Y,TRIALS)
         report=nn.get_report(X,Y)
         self.assertEqual(report["errors"],[])
 
@@ -95,7 +105,7 @@ class TestNN(unittest.TestCase):
         X,Y,a,b=get_data_1csv("tests/3outputs2bools.csv",1)
 
         nn=NN([2,50,3],verbose=0,learning_rate=0.1)
-        nn.train(X,Y,10000)
+        nn.train(X,Y,TRIALS)
         report=nn.get_report(X,Y)
         self.assertEqual(report["errors"],[])
 
