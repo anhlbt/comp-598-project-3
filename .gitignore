@@ -1,5 +1,6 @@
 */logs
 *.bs
+.ipynb_checkpoints/
 
 venv/
 *.pyc
