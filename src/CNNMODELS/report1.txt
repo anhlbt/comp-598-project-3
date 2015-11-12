@@ -1,0 +1,39 @@
+Model with rank: 1
+Mean validation score: 0.502 (std: 0.000)
+Parameters: {'p': 0.51221599476999473, 'update_learning_rate': 0.01064499164578778, 'update_momentum': 0.91352699589488, 'num_filters1': 32,'num_filters1': 64}
+
+Model with rank: 2
+Mean validation score: 0.492 (std: 0.000)
+Parameters: {'p': 0.5637040674774771, 'update_learning_rate': 0.009892801971218328, 'update_momentum': 0.9468960973673631, 'num_filters1': 63,'num_filters2': 99}
+
+Model with rank: 3
+Mean validation score: 0.480 (std: 0.000)
+Parameters: {'p': 0.6078659297232203, 'update_learning_rate': 0.010694675739290053, 'update_momentum': 0.7168119761446152, 'num_filters1': 15,'num_filters2': 42}
+
+Model with rank: 4
+Mean validation score: 0.477 (std: 0.000)
+Parameters: {'p': 0.15543656731019595, 'update_learning_rate': 0.007025415126151051, 'update_momentum': 0.8022797047592151, 'num_filters1': 43,'num_filters2': 80}
+
+Model with rank: 5
+Mean validation score: 0.477 (std: 0.000)
+Parameters: {'p': 0.4000804018488181, 'update_learning_rate': 0.00870990383597324, 'update_momentum': 0.9160907182082736, 'num_filters1': 10,'num_filters2': 31}
+
+Model with rank: 6
+Mean validation score: 0.476 (std: 0.000)
+Parameters: {'p': 0.5325885276051863, 'update_learning_rate': 0.00683276267548696, 'update_momentum': 0.9435852520381713, 'num_filters1': 21,'num_filters2': 56}
+
+Model with rank: 7
+Mean validation score: 0.475 (std: 0.000)
+Parameters: {'p': 0.1732769724711507, 'update_learning_rate': 0.007309617915137403, 'update_momentum': 0.9231029787896854, 'num_filters1': 39,'num_filters2': 71, }
+
+Model with rank: 8
+Mean validation score: 0.471 (std: 0.000)
+Parameters: {'p': 0.24653004995001784, 'update_learning_rate': 0.007745189176271871, 'update_momentum': 0.8359978468903817, 'num_filters1': 9,'num_filters2': 22}
+
+Model with rank: 9
+Mean validation score: 0.466 (std: 0.000)
+Parameters: {'p': 0.29364837143900024, 'update_learning_rate': 0.008771767618901282, 'update_momentum': 0.78232602196259, 'num_filters1': 30,'num_filters2': 44}
+
+Model with rank: 10
+Mean validation score: 0.465 (std: 0.000)
+Parameters: {'p': 0.6556385921990794, 'update_learning_rate': 0.006476023703013627, 'update_momentum': 0.8376251627383655, 'num_filters1': 26,'num_filters2': 32}

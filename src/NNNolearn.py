@@ -22,11 +22,11 @@ import pickle
 import data_manager
 
 #visualizations
-from nolearn.lasagne.visualize import plot_loss
-from nolearn.lasagne.visualize import plot_conv_weights
-from nolearn.lasagne.visualize import plot_conv_activity
-from nolearn.lasagne.visualize import plot_occlusion
-from nolearn.lasagne import PrintLayerInfo
+#from nolearn.lasagne.visualize import plot_loss
+#from nolearn.lasagne.visualize import plot_conv_weights
+#from nolearn.lasagne.visualize import plot_conv_activity
+#from nolearn.lasagne.visualize import plot_occlusion
+#from nolearn.lasagne import PrintLayerInfo
 import sys
 
 sys.setrecursionlimit(10000)
@@ -52,81 +52,68 @@ class AdjustVariable(object):
 
 convnet = NeuralNet(
     layers = [
-        (InputLayer, {'shape': (None, 1, 48,48)}),
+        (InputLayer, {'shape': (None, 1, 38,38)}),
 
         (Conv2DLayer, {'num_filters': 32, 'filter_size': (3, 3), 'pad': 1}),
-        (Conv2DLayer, {'num_filters': 32, 'filter_size': (3, 3), 'pad': 1}),
         #(Conv2DLayer, {'num_filters': 32, 'filter_size': (3, 3), 'pad': 1}),
         #(Conv2DLayer, {'num_filters': 32, 'filter_size': (3, 3), 'pad': 1}),
-        #(Conv2DLayer, {'num_filters': 32, 'filter_size': (3, 3), 'pad': 1}),
-        #(Conv2DLayer, {'num_filters': 32, 'filter_size': (3, 3), 'pad': 1}),
-        #(Conv2DLayer, {'num_filters': 32, 'filter_size': (3, 3), 'pad': 1}),
+        
         (MaxPool2DLayer, {'pool_size': (2, 2)}),
-        (DropoutLayer, {}),
+        (DropoutLayer, {'p':.5}),
 
-        (Conv2DLayer, {'num_filters': 32, 'filter_size': (3, 3), 'pad': 1}),
+        (Conv2DLayer, {'num_filters': 64, 'filter_size': (3, 3), 'pad': 1}),
         #(Conv2DLayer, {'num_filters': 64, 'filter_size': (3, 3), 'pad': 1}),
-        #(Conv2DLayer, {'num_filters': 64, 'filter_size': (3, 3), 'pad': 1}),
+       	#(Conv2DLayer, {'num_filters': 64, 'filter_size': (3, 3), 'pad': 1}),
+
         (MaxPool2DLayer, {'pool_size': (2, 2)}),
-        (DropoutLayer, {}),
+        (DropoutLayer, {'p':.5}),
 
         (DenseLayer, {'num_units': 256}),
-        (DropoutLayer, {}),
-        #(DenseLayer, {'num_units': 64}),
+        (DropoutLayer, {'p':.5}),
+        (DenseLayer, {'num_units': 256}),
 
         (DenseLayer, {'num_units': 10, 'nonlinearity': softmax}),
     ],
-    update_learning_rate=theano.shared(float32(0.03)),
+    update_learning_rate=theano.shared(float32(0.005)),
     update_momentum=theano.shared(float32(0.9)),
+    #update_learning_rate=.01,
     verbose=2,
-    max_epochs = 500,
+    max_epochs = 200,
     
     )
 
-def formatData(XDATA, yDATA ):
+def formatData(XDATA, yDATA = None):
     # apply some very simple normalization to the data
     XDATA -= XDATA.mean()
     XDATA /= XDATA.std()
 
-    XDATA = XDATA.reshape(-1,1,48,48)
-    
-    #X_train,  X_val, y_train, y_val = train_test_split(XDATA,yDATA,test_size=10000,random_state=42)
-
-    #X_test, X_val,y_test,y_val = train_test_split(temp_set_x,temp_set_y,test_size=.5,random_state=42)
+    XDATA = XDATA.reshape(-1,1,38,38)
 
     X_train = XDATA.astype(np.float32)
-    #X_test = X_test.astype(np.float32)
-    #X_val = X_val.astype(np.float32)
+    
 
     y_train = yDATA.astype(np.int32)
-    #y_test = y_test.astype(np.int32)
-    #y_val = y_val.astype(np.int32)
+    
 
     return X_train,y_train
 
 # Load the dataset
 print("Loading data...")
-XDATA, yDATA = data_manager.load_test_data()
 
+XDATA = np.load('rotatedTrimedX.npz')['arr_0']
+yDATA = np.load('rotatedTrimedY.npz')['arr_0']
+
+#XDATA, yDATA = data_manager.load_all_images(True,True)
+#XDATA, yDATA = data_manager.load_transformed_images()
 X_train,y_train = formatData(XDATA,yDATA)
 
+print(X_train.shape)
 convnet.fit(X_train,y_train)
 
-plot_loss(convnet)
-
-plot_conv_weights(convnet.layers_[1], figsize=(4, 4))
-
-x = X_train[0:1]
-
-plot_conv_activity(convnet.layers_[1], x)
-
-plot_occlusion(convnet, X_train[:5], y_train[:5])
-
-#layer_info = PrintLayerInfo()
-
-#layer_info(convnet)
-
-
-
-with open('convnet.pickle', 'wb') as f:
+with open('./CNNMODELS/convnet.pickle', 'wb') as f:
     pickle.dump(convnet, f, -1)
+
+
+
+
+
