@@ -109,6 +109,9 @@ class NeuralNet(NeuralNetView):
         return self.outputs[-1].flatten()
     
     def backward(self, desired_outputs,custom_learning_rate=-1):
+        #this is the original back propagation function. it was broken up into
+        #get_adjustments and adjust_weights
+
         #where desired_outputs is simply a list of numbers 0 to 1, of length self.sizes[-1]
 
         #if custom learning rate is -1, just use regular learning rate
